@@ -12,6 +12,8 @@ import {z} from 'genkit';
 
 const ExtractContactDataInputSchema = z.object({
   photoUrl: z.string().describe('The URL of the contact card photo.'),
+  fileType: z.string().describe('The file type of the contact card photo.'),
+  base64String: z.string().describe('The base64 string of the contact card photo')
 });
 export type ExtractContactDataInput = z.infer<typeof ExtractContactDataInputSchema>;
 
@@ -32,7 +34,8 @@ const prompt = ai.definePrompt({
   name: 'extractContactDataPrompt',
   input: {
     schema: z.object({
-      photoUrl: z.string().describe('The URL of the contact card photo.'),
+      base64String: z.string().describe('The base64 string of the contact card photo.'),
+      fileType: z.string().describe('The file type of the contact card photo.'),
     }),
   },
   output: {
@@ -52,7 +55,7 @@ const prompt = ai.definePrompt({
 - Receiver's Phone Number
 - Receiver's Address
 
-Image: {{media url=photoUrl contentType="image/png"}}
+Image: {{media url=base64String contentType=fileType}}
 
 Provide the extracted information in the specified output format. If a field cannot be determined from the image, leave it blank.
 `,
@@ -66,9 +69,6 @@ const extractContactDataFlow = ai.defineFlow<
   inputSchema: ExtractContactDataInputSchema,
   outputSchema: ExtractContactDataOutputSchema,
 }, async input => {
-  const {output} = await prompt(input);
+  const {output} = await prompt({base64String: input.base64String, fileType: input.fileType});
   return output!;
 });
-
-
-    

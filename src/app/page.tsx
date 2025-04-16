@@ -19,6 +19,15 @@ const initialContactData = {
   receiverAddress: '',
 };
 
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+}
+
 export default function Home() {
   const [extractedData, setExtractedData] = useState(initialContactData);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,11 +39,11 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      const base64String = await fileToBase64(file);
+      const fileType = file.type;
       const photoUrl = URL.createObjectURL(file);
 
-      const extracted = await extractContactData({photoUrl});
+      const extracted = await extractContactData({photoUrl: photoUrl, fileType: fileType, base64String: base64String});
       setExtractedData(extracted);
       toast({
         title: "Success",
