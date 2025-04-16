@@ -52,7 +52,7 @@ const prompt = ai.definePrompt({
 - Receiver's Phone Number
 - Receiver's Address
 
-Image: {{media url=photoUrl}}
+Image: {{media url=photoUrl contentType="image/png"}}
 
 Provide the extracted information in the specified output format. If a field cannot be determined from the image, leave it blank.
 `,
@@ -69,3 +69,6 @@ const extractContactDataFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
+
+
+    
